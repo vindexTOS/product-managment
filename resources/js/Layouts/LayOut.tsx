@@ -7,6 +7,7 @@ import {
 } from '@ant-design/icons'
 import { Button, Layout, Menu, theme } from 'antd'
 import { Footer } from 'antd/es/layout/layout'
+import { Link } from '@inertiajs/react'
 
 const { Header, Sider, Content } = Layout
 
@@ -20,23 +21,14 @@ const LayoutComp: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     <Layout className="w-100 h-100" style={{ height: '100vh' }}>
       <Sider trigger={null} collapsible collapsed={collapsed}>
         <div className="demo-logo-vertical" />
-        <Menu
-          theme="dark"
-          mode="inline"
-          defaultSelectedKeys={['1']}
-          items={[
-            {
-              key: 'Product',
-              icon: <ProductOutlined />,
-              label: 'Product',
-            },
-            {
-              key: 'Admin Pannel',
-              icon: <UserOutlined />,
-              label: 'Admin Pannel',
-            },
-          ]}
-        />
+        <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
+          <Menu.Item key="Product" icon={<ProductOutlined />}>
+            <Link href="/products">Product</Link>
+          </Menu.Item>
+          <Menu.Item key="AdminPanel" icon={<UserOutlined />}>
+            <Link href="/admin">Admin Panel</Link>
+          </Menu.Item>
+        </Menu>
       </Sider>
       <Layout>
         <Header style={{ padding: 0, background: colorBgContainer }}>

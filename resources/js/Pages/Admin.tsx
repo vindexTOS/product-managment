@@ -1,5 +1,9 @@
 import React from 'react'
-
+import LayoutComp from '@/Layouts/LayOut'
 export default function Admin() {
-  return <div>Admin</div>
+  return (
+    <LayoutComp>
+      <div>Admin</div>
+    </LayoutComp>
+  )
 }

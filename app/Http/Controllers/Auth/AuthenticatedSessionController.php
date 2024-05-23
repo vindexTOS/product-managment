@@ -29,13 +29,18 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        Route::get('/admin', function () {
+            return Inertia::render('Admin');
+        })
+            ->middleware(['auth', \App\Http\Middleware\SuperAdmin::class])
+            ->name('admin');
 
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()
+            ->back()
+            ->withErrors([
+                'email' => 'The provided credentials do not match our records.',
+            ]);
     }
-
     /**
      * Destroy an authenticated session.
      */

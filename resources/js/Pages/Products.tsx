@@ -1,10 +1,9 @@
-import LayoutComp from '@/Layouts/LayOut'
 import React from 'react'
-
-export default function Home() {
+import LayoutComp from '@/Layouts/LayOut'
+export default function Products() {
   return (
     <LayoutComp>
-      <div>HOMe</div>
+      <div>Products</div>
     </LayoutComp>
   )
 }

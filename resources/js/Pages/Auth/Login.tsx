@@ -1,10 +1,22 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { LockOutlined, UserOutlined } from '@ant-design/icons'
 import { Button, Checkbox, Form, Input } from 'antd'
+import axios from 'axios'
 
 export default function Login() {
   const onFinish = (values: any) => {
-    console.log('Received values of form: ', values)
+    console.log(values)
+    axios
+      .post('/login', values)
+      .then((response) => {
+        console.log(response.data)
+        // Handle successful login response, e.g., redirect to dashboard
+        window.location.href = response.data.redirect // Assuming the backend returns a redirect URL
+      })
+      .catch((error) => {
+        console.error('Error:', error.response.data)
+        // Handle error response, e.g., display error message to the user
+      })
   }
 
   return (
@@ -13,11 +25,16 @@ export default function Login() {
         width: '100vw',
         height: '100vh',
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
       }}
     >
+      <div>
+        <h1>შეიყვანეთ ადმინის მეილი და პაროლი</h1>
+        <p>email: admin@gmail.com</p>
+        <p>password: 1234</p>
+      </div>
       <Form
         style={{
           backgroundColor: '#d3d3d3',
@@ -30,12 +47,12 @@ export default function Login() {
         onFinish={onFinish}
       >
         <Form.Item
-          name="username"
-          rules={[{ required: true, message: 'Please input your Username!' }]}
+          name="email"
+          rules={[{ required: true, message: 'Please input your email!' }]}
         >
           <Input
             prefix={<UserOutlined className="site-form-item-icon" />}
-            placeholder="Username"
+            placeholder="email"
           />
         </Form.Item>
         <Form.Item
