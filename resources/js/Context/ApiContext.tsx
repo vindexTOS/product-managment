@@ -1,5 +1,6 @@
 import { CategoryType } from '@/types/category'
 import { Product } from '@/types/product'
+import { router } from '@inertiajs/react'
 import { UploadFile } from 'antd'
 import axios from 'axios'
 import {
@@ -30,6 +31,7 @@ interface State {
   categorySearch: string
   UploadFile: UploadFile[]
   productData: Product[]
+  productSingle: Product | any
 }
 
 type Action =
@@ -42,6 +44,8 @@ type Action =
   | { type: 'set_images'; payload: UploadFile[] }
   | { type: 'get_products'; payload: Product[] }
   | { type: 'trigger_GetProduct' }
+  | { type: 'get_single_product'; payload: Product }
+  | { type: 'trigger_GetSingleProduct'; payload: string }
 
 const Context = createContext<null | Cell>(null)
 
@@ -56,26 +60,17 @@ export const ApiContextProvider = ({ children }: ApiContextProviderProps) => {
     UploadFile: [],
     // products
     productData: [],
+    productSingle: {},
   }
   //   get categorys
-  const GetCategory = async (payload: GetCategoryType) => {
+
+  const GetCategory = (payload: GetCategoryType) => {
     const { page, perPage, search } = payload
     axios
-      .get('/category', {
+      .get('/api/category', {
         params: { page, per_page: perPage, search },
       })
       .then((response) => {
-        if (response.data.data.length <= 0) {
-          dispatch({
-            type: 'get_category',
-            payload: [
-              {
-                id: 1,
-                name: 'NO CATEGORIES ',
-              },
-            ],
-          })
-        }
         dispatch({ type: 'get_category', payload: response.data.data })
         dispatch({ type: 'set_category_total', payload: response.data.total })
       })
@@ -84,12 +79,22 @@ export const ApiContextProvider = ({ children }: ApiContextProviderProps) => {
       })
   }
 
-  const GetProduct = async () => {
+  const GetProducts = () => {
     axios
-      .get('/product')
+      .get('/api/product')
       .then((response) => {
-        console.log(response)
         dispatch({ type: 'get_products', payload: response.data.data.data })
+      })
+      .catch((error) => {
+        console.error('Error:', error.response.data)
+      })
+  }
+
+  const GetSingleProduct = (id: string) => {
+    axios
+      .get(`/api/product/${id}`)
+      .then((response) => {
+        dispatch({ type: 'get_single_product', payload: response.data.data })
       })
       .catch((error) => {
         console.error('Error:', error.response.data)
@@ -117,8 +122,14 @@ export const ApiContextProvider = ({ children }: ApiContextProviderProps) => {
       // products
       case 'get_products':
         return { ...state, productData: action.payload }
+
       case 'trigger_GetProduct':
-        GetProduct()
+        GetProducts()
+        return { ...state }
+      case 'get_single_product':
+        return { ...state, productSingle: action.payload }
+      case 'trigger_GetSingleProduct':
+        GetSingleProduct(action.payload)
         return { ...state }
       default:
         return state
@@ -127,13 +138,11 @@ export const ApiContextProvider = ({ children }: ApiContextProviderProps) => {
 
   const [state, dispatch] = useReducer(reducer, initialState)
 
-  if (state.categoryData.length <= 0) {
+  useEffect(() => {
     GetCategory({ page: 1, perPage: 50, search: '' })
-  }
 
-  if (state.productData.length <= 0) {
-    GetProduct()
-  }
+    GetProducts()
+  }, [])
 
   return (
     <Context.Provider value={{ state, dispatch }}>{children}</Context.Provider>

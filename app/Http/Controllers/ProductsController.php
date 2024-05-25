@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductsController extends Controller
 {
+    //   make  product
     public function store(Request $request)
     {
         try {
@@ -68,7 +69,7 @@ class ProductsController extends Controller
             Log::error('An error occurred: ' . $th->getMessage());
         }
     }
-
+    //  get all the products
     public function show(Request $request)
     {
         $perPage = $request->get('per_page', 10);
@@ -103,5 +104,42 @@ class ProductsController extends Controller
         }
 
         return response()->json(['error' => 'Image not found'], 404);
+    }
+    //   get single product
+    public function showSingleProduct($id)
+    {
+        try {
+            $product = Product::with([
+                'images',
+
+                'productMetaDatas.category',
+            ])->find($id);
+            if (!$product) {
+                return response()->json(['error' => 'Product not found'], 404);
+            }
+
+            return response()->json(['data' => $product], 200);
+        } catch (\Throwable $th) {
+            Log::error('An error occurred: ' . $th->getMessage());
+        }
+    }
+    // delete product
+
+    public function destroy($id)
+    {
+        try {
+            $product = Product::find($id);
+            if (!$product) {
+                return response()->json(['error' => 'Product not found.'], 404);
+            }
+            $product->delete();
+
+            return response()->json(
+                ['message' => 'Product deleted successfully.'],
+                200
+            );
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
     }
 }

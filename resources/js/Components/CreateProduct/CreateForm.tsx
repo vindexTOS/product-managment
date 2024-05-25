@@ -36,7 +36,7 @@ const CreateForm: React.FC = () => {
     })
 
     try {
-      const response = await axios.post('/product', formData, {
+      const response = await axios.post('/api/product', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

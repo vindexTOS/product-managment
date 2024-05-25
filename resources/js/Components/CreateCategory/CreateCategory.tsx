@@ -10,7 +10,7 @@ export default function CreateCategory() {
   const { state, dispatch } = UseApiContext()
   const onSubmit = async (values: any) => {
     axios
-      .post('/category', { category: values['new category'] })
+      .post('/api/category', { category: values['new category'] })
       .then((response) => {
         onSuccess(response.data.message)
         form.resetFields()

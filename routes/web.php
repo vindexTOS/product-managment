@@ -15,24 +15,40 @@ Route::get('/', function () {
 Route::get('/products', function () {
     return Inertia::render('Products');
 });
+
+Route::get('/product/{id}', function () {
+    return Inertia::render('ProductPage');
+});
 Route::get('/admin', function () {
     return Inertia::render('Admin');
 })
     ->middleware(['auth', SuperAdmin::class])
     ->name('admin');
-
-Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+// /api
+Route::post('/api/login', [AuthenticatedSessionController::class, 'store']);
 
 // categorys
 
-Route::post('/category', [CategorysController::class, 'store']);
-Route::delete('/category/delete:id', [CategorysController::class, 'destroy']);
-Route::get('/category', [CategorysController::class, 'show']);
+Route::post('/api/category', [CategorysController::class, 'store']);
+Route::delete('/api/category/delete:id', [
+    CategorysController::class,
+    'destroy',
+]);
+Route::get('/api/category', [CategorysController::class, 'show']);
 
 //  product
 
-Route::post('/product', [ProductsController::class, 'store']);
-Route::get('/product', [ProductsController::class, 'show']);
-Route::get('/images/{filename}', [ProductsController::class, 'showImage']);
+Route::post('/api/product', [ProductsController::class, 'store']);
+Route::get('/api/product', [ProductsController::class, 'show']);
+Route::get('/api/product/{id}', [
+    ProductsController::class,
+    'showSingleProduct',
+]);
+Route::delete('/api/product/{id}', [ProductsController::class, 'destroy']);
+Route::get('images/{filename}', [ProductsController::class, 'showImage']);
+Route::get('product/images/{filename}', [
+    ProductsController::class,
+    'showImage',
+]);
 
 require __DIR__ . '/auth.php';
