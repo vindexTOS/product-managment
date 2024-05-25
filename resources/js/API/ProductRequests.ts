@@ -18,15 +18,26 @@ export const PostProduct = async (formData: any) => {
   }
 }
 
-export const GetProducts = async () => {
+export const GetProducts = async (
+  page = 1,
+  perPage = 10,
+  search = '',
+  categories = [],
+) => {
   try {
-    const response = await axios.get('/api/product')
-
-    return response.data.data.data
+    const response = await axios.get('/api/product', {
+      params: {
+        page,
+        per_page: perPage,
+        search,
+        categories,
+      },
+    })
+    console.log(response.data)
+    return response.data
   } catch (error) {
     const err: any = error
-
-    onError(err.response.data.message)
+    throw new Error(err)
   }
 }
 

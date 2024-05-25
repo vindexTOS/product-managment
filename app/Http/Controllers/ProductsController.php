@@ -74,13 +74,29 @@ class ProductsController extends Controller
     {
         $perPage = $request->get('per_page', 10);
         $search = $request->get('search', '');
+        $categories = $request->get('categories', []);
 
         try {
-            $data = Product::with(['images', 'productMetaDatas.category'])
-                ->where('name', 'like', '%' . $search . '%')
-                ->orWhere('description', 'like', '%' . $search . '%')
-                ->paginate($perPage);
-            // dd($data); // Inspect the retrieved data
+            $query = Product::with(['images', 'productMetaDatas.category']);
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q
+                        ->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('description', 'like', '%' . $search . '%');
+                });
+            }
+
+            if (!empty($categories)) {
+                $query->whereHas('productMetaDatas.category', function (
+                    $q
+                ) use ($categories) {
+                    $q->whereIn('name', $categories);
+                });
+            }
+
+            $data = $query->paginate($perPage);
+
             return response()->json(
                 [
                     'data' => $data,
@@ -89,6 +105,7 @@ class ProductsController extends Controller
             );
         } catch (\Throwable $th) {
             Log::error('An error occurred: ' . $th->getMessage());
+            return response()->json(['error' => 'An error occurred.'], 500);
         }
     }
 

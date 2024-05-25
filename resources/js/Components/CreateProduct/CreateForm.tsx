@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import { Button, Form, Input, Select, Space, Spin } from 'antd'
 import { UseFileContext } from '@/Context/FileContext'
-
+import { onError } from '../StatusHandler/Status'
 import ImageUpload from './ImageUpload'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { PostProduct } from '../..//API/ProductRequests'
@@ -34,6 +34,15 @@ const CreateForm: React.FC = () => {
     },
   })
   const CreateNewProduct = async (value: any) => {
+    if (categories.length <= 0) {
+      onError('please add atleast one category')
+      return
+    }
+
+    if (state.UploadFile.length <= 0) {
+      onError('please add atleast one image')
+      return
+    }
     const formData = new FormData()
     formData.append('name', value.name)
     formData.append('price', value.price)

@@ -8,6 +8,8 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query'
+import defaultimage from '../../assets/default-product-image.png'
+
 import { DeleteProduct } from '../../API/ProductRequests'
 const { confirm } = Modal
 interface ProductCardProps {
@@ -53,7 +55,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <img
           style={{ height: '300px' }}
           alt={product.name}
-          src={product.images[0].url}
+          src={product.images[0].url ? product.images[0].url : defaultimage}
         />
       }
     >
