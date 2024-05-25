@@ -4,7 +4,10 @@ use Inertia\Inertia;
 use App\Http\Middleware\SuperAdmin;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CategorysController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\ProductsController;
 
 Route::get('/', function () {
     return Inertia::render('Products');
@@ -20,16 +23,16 @@ Route::get('/admin', function () {
 
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
-// Route::middleware('auth')->group(function () {
-//     Route::get('/profile', [ProfileController::class, 'edit'])->name(
-//         'profile.edit'
-//     );
-//     Route::patch('/profile', [ProfileController::class, 'update'])->name(
-//         'profile.update'
-//     );
-//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name(
-//         'profile.destroy'
-//     );
-// });
+// categorys
+
+Route::post('/category', [CategorysController::class, 'store']);
+Route::delete('/category/delete:id', [CategorysController::class, 'destroy']);
+Route::get('/category', [CategorysController::class, 'show']);
+
+//  product
+
+Route::post('/product', [ProductsController::class, 'store']);
+Route::get('/product', [ProductsController::class, 'show']);
+Route::get('/images/{filename}', [ProductsController::class, 'showImage']);
 
 require __DIR__ . '/auth.php';

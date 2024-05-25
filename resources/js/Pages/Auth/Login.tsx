@@ -9,13 +9,10 @@ export default function Login() {
     axios
       .post('/login', values)
       .then((response) => {
-        console.log(response.data)
-        // Handle successful login response, e.g., redirect to dashboard
-        window.location.href = response.data.redirect // Assuming the backend returns a redirect URL
+        window.location.href = '/admin'
       })
       .catch((error) => {
         console.error('Error:', error.response.data)
-        // Handle error response, e.g., display error message to the user
       })
   }
 

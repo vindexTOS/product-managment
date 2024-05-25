@@ -29,11 +29,10 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        Route::get('/admin', function () {
-            return Inertia::render('Admin');
-        })
-            ->middleware(['auth', \App\Http\Middleware\SuperAdmin::class])
-            ->name('admin');
+        if (Auth::attempt($request->only('email', 'password'))) {
+            $request->session()->regenerate();
+            return redirect()->intended(route('admin'));
+        }
 
         return redirect()
             ->back()

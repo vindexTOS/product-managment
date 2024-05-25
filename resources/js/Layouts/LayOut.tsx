@@ -18,7 +18,7 @@ const LayoutComp: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   } = theme.useToken()
 
   return (
-    <Layout className="w-100 h-100" style={{ height: '100vh' }}>
+    <Layout className="w-100  " style={{ height: '100%' }}>
       <Sider trigger={null} collapsible collapsed={collapsed}>
         <div className="demo-logo-vertical" />
         <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
