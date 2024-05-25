@@ -2,40 +2,40 @@ import React, { useEffect, useState } from 'react'
 import { Card, Tag, Row, Col, Image, Typography, Spin } from 'antd'
 import { ImageType, Product, ProductMetaData } from '../types/product'
 import Layout from '../Layouts/LayOut'
-import { UseApiContext } from '@/Context/ApiContext'
-import useSelection from 'antd/es/table/hooks/useSelection'
+
+import { useQuery } from '@tanstack/react-query'
+import { GetSingleProduct } from '../API/ProductRequests'
 const { Title, Paragraph } = Typography
 
 const ProductSinglePage: React.FC = () => {
-  const { state, dispatch } = UseApiContext()
-  const { isLoading } = state
-  const product = state.productSingle
   const pathParts = window.location.pathname.split('/')
   const productId = pathParts[pathParts.length - 1]
-  useEffect(() => {
-    dispatch({ type: 'trigger_GetSingleProduct', payload: productId })
-  }, [])
-  if (isLoading) {
+
+  const { data, isPending, isError, error } = useQuery({
+    queryKey: ['product'],
+    queryFn: () => GetSingleProduct(productId),
+  })
+  if (isPending) {
     return <Spin />
   }
   return (
     <Layout>
-      <div style={{ padding: '20px' }} onClick={() => console.log(product)}>
-        {/* <Card
+      <div style={{ padding: '20px' }} onClick={() => console.log(data)}>
+        <Card
           hoverable
           cover={
             <Image
               style={{ width: '100%', height: 'auto' }}
-              alt={product.name}
-              src={product.images[0].url}
+              alt={data.name}
+              src={data.images[0].url}
             />
           }
         >
-          <Title level={2}>{product.name}</Title>
-          <Paragraph>{product.description}</Paragraph>
-          <Title level={4}>Price: {product.price}</Title>
+          <Title level={2}>{data.name}</Title>
+          <Paragraph>{data.description}</Paragraph>
+          <Title level={4}>Price: {data.price}</Title>
           <Title level={4}>Categories:</Title>
-          {product.product_meta_datas.map((metaData: ProductMetaData) => (
+          {data.product_meta_datas.map((metaData: ProductMetaData) => (
             <Tag key={metaData.id}>{metaData.category.name}</Tag>
           ))}
         </Card>
@@ -44,16 +44,16 @@ const ProductSinglePage: React.FC = () => {
           Photos
         </Title>
         <Row gutter={[16, 16]}>
-          {product.images.map((image: ImageType) => (
+          {data.images.map((image: ImageType) => (
             <Col key={image.id} xs={24} sm={12} md={8} lg={6}>
               <Image
                 src={image.url}
-                alt={product.name}
-                style={{ width: '100%', height: 'auto' }}
+                alt={data.name}
+                style={{ width: '300px', height: '200px' }}
               />
             </Col>
           ))}
-        </Row> */}
+        </Row>
       </div>
     </Layout>
   )

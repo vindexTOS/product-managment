@@ -1,7 +1,6 @@
 import React from 'react'
 import { Button, Card, Tag } from 'antd'
 import { Product } from '../../types/product'
-import { UseApiContext } from '@/Context/ApiContext'
 import { router } from '@inertiajs/react'
 
 interface ProductCardProps {
@@ -9,8 +8,6 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { state, dispatch } = UseApiContext()
-
   const navigateToProduct = (id: string) => {
     router.visit(`/product/${id}`)
   }

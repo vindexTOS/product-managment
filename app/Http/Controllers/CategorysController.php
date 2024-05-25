@@ -63,7 +63,7 @@ class CategorysController extends Controller
 
     public function destroy($id)
     {
-        $category = Category::find($id)->first();
+        $category = Category::find($id);
 
         if (!$category) {
             return response()->json(['error' => 'Category not found.'], 404);

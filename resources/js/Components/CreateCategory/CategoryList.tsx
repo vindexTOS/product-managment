@@ -1,49 +1,63 @@
 import { CategoryType } from '@/types/category'
-import { Row, Col, Button, Pagination, Input } from 'antd'
+import { Row, Col, Button, Pagination, Input, Spin } from 'antd'
 
 import { DeleteOutlined } from '@ant-design/icons'
-import { UseApiContext } from '@/Context/ApiContext'
-import { useEffect } from 'react'
+import { useState } from 'react'
+import { GetCategory } from '../../API/CategoryRequests'
+import { useQuery } from '@tanstack/react-query'
 
-export default function CategoryList({ data }: { data: CategoryType[] }) {
-  const { dispatch, state } = UseApiContext()
+export default function CategoryList() {
+  const [query, setQuery] = useState({
+    page: 1,
+    perPage: 50,
+    search: '',
+    searchTerm: '',
+  })
+  const { page, perPage, search, searchTerm } = query
+  const { data, isPending } = useQuery({
+    queryKey: ['category', search, perPage, search],
+    queryFn: () =>
+      GetCategory({
+        page,
+        perPage,
+        search,
+      }),
+  })
 
-  const { categoryCurrentPage, categoryPageSize, categorySearch } = state
-
-  const callQueryButton = () => {
-    dispatch({
-      type: 'triggere_GetCategory',
-      payload: {
-        page: categoryCurrentPage,
-        perPage: categoryPageSize,
-        search: categorySearch,
-      },
-    })
-  }
   const handlePageChange = (page: number, pageSize?: number) => {
-    dispatch({ type: 'set_category_current', payload: page })
+    setQuery((prevQuery) => ({ ...prevQuery, page }))
     if (pageSize) {
-      dispatch({ type: 'set_category_page_size', payload: pageSize })
+      setQuery((prevQuery) => ({ ...prevQuery, pageSize }))
     }
   }
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch({ type: 'set_category_search', payload: e.target.value })
+    setQuery((prevQuery) => ({ ...prevQuery, searchTerm: e.target.value }))
   }
-  useEffect(() => {
-    callQueryButton()
-  }, [state.categoryCurrentPage, state.categoryPageSize])
+
+  const handleSearchButton = () => {
+    setQuery((prevQuery) => ({ ...prevQuery, search: searchTerm }))
+  }
+  if (isPending) {
+    return <Spin />
+  }
   return (
     <div>
       <Input.Search
         placeholder="Search categories"
-        value={state.categorySearch}
+        value={searchTerm}
         onChange={handleSearch}
         style={{ marginBottom: '16px' }}
-        onSearch={callQueryButton}
+        onSearch={handleSearchButton}
       />
-      <Row gutter={[5, 5]} style={{ height: '200px', overflowY: 'scroll' }}>
-        {state.categoryData.map((val: CategoryType) => (
+      <Row
+        onClick={() => {
+          console.log(data)
+        }}
+        gutter={[5, 5]}
+        style={{ height: '200px', overflowY: 'scroll' }}
+      >
+        {data?.map((val: CategoryType) => (
           <Col
             key={val.id}
             span={24}
@@ -62,9 +76,9 @@ export default function CategoryList({ data }: { data: CategoryType[] }) {
         ))}
       </Row>
       <Pagination
-        current={state.categoryCurrentPage}
-        pageSize={state.categoryPageSize}
-        total={state.categoryTotal}
+        current={page}
+        pageSize={perPage}
+        total={10}
         onChange={handlePageChange}
       />
     </div>

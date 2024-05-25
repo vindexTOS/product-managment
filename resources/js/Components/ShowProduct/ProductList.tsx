@@ -1,15 +1,22 @@
-import { UseApiContext } from '@/Context/ApiContext'
-import React from 'react'
 import { Product } from '../../types/product'
 import ProductCard from './ProductCard'
+import { useQuery } from '@tanstack/react-query'
+import { GetProducts } from '../../API/ProductRequests'
+import { Spin } from 'antd'
 
 export default function ProductList() {
-  const { state, dispatch } = UseApiContext()
+  const { data, isPending } = useQuery({
+    queryKey: ['products'],
+    queryFn: () => GetProducts(),
+  })
 
+  if (isPending) {
+    return <Spin />
+  }
   return (
     <section style={{}}>
       <main style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-        {state.productData.map((val: Product) => {
+        {data.map((val: Product) => {
           return <ProductCard key={val.id} product={val} />
         })}
       </main>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { PlusOutlined } from '@ant-design/icons'
 import { Image, Upload } from 'antd'
 import type { GetProp, UploadFile, UploadProps } from 'antd'
-import { UseApiContext } from '@/Context/ApiContext'
+import { UseFileContext } from '@/Context/FileContext'
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0]
 
@@ -15,7 +15,7 @@ const getBase64 = (file: FileType): Promise<string> =>
   })
 
 const ImageUpload = ({ reset }: { reset: boolean }) => {
-  const { dispatch } = UseApiContext()
+  const { dispatch } = UseFileContext()
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewImage, setPreviewImage] = useState('')
   const [fileList, setFileList] = useState<UploadFile[]>([])

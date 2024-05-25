@@ -1,31 +1,30 @@
 import React from 'react'
-import { Button, Form, Input, message, Space } from 'antd'
+import { Button, Form, Input, message, Space, Spin } from 'antd'
 import axios from 'axios'
-import { UseApiContext } from '@/Context/ApiContext'
 import CategoryList from './CategoryList'
 import { onSuccess, onError } from '../StatusHandler/Status'
+import {
+  InvalidateQueryFilters,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query'
+import { PostCategory } from '../../API/CategoryRequests'
 
 export default function CreateCategory() {
   const [form] = Form.useForm()
-  const { state, dispatch } = UseApiContext()
+  const queryClient = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: (value: any) => {
+      return PostCategory(value)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries('category' as InvalidateQueryFilters)
+    },
+  })
   const onSubmit = async (values: any) => {
-    axios
-      .post('/api/category', { category: values['new category'] })
-      .then((response) => {
-        onSuccess(response.data.message)
-        form.resetFields()
-        dispatch({
-          type: 'triggere_GetCategory',
-          payload: {
-            page: 1,
-            perPage: 5,
-            search: '',
-          },
-        })
-      })
-      .catch((error) => {
-        onError(error.response.data.message)
-      })
+    await mutation.mutateAsync(values['new category'])
+    mutation.reset()
+    form.resetFields()
   }
 
   return (
@@ -44,6 +43,7 @@ export default function CreateCategory() {
         onFinish={onSubmit}
         autoComplete="off"
       >
+        {mutation.isPending && <Spin />}
         <Form.Item
           name="new category"
           label="new category"
@@ -63,7 +63,7 @@ export default function CreateCategory() {
           </Space>
         </Form.Item>
       </Form>
-      <CategoryList data={state.categoryData} />
+      <CategoryList />
     </section>
   )
 }

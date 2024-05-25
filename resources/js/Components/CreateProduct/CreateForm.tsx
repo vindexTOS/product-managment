@@ -1,10 +1,14 @@
 import React, { useState } from 'react'
 
-import { Button, DatePicker, Form, Input, Select, Space, Spin } from 'antd'
-import { UseApiContext } from '@/Context/ApiContext'
-import { onSuccess, onError } from '../StatusHandler/Status'
-import axios from 'axios'
+import { Button, Form, Input, Select, Space, Spin } from 'antd'
+import { UseFileContext } from '@/Context/FileContext'
+
 import ImageUpload from './ImageUpload'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { PostProduct } from '../..//API/ProductRequests'
+import { GetCategory } from '../../API/CategoryRequests'
+import { CategoryType } from '../../types/category'
+
 const { TextArea } = Input
 
 const normFile = (e: any) => {
@@ -15,44 +19,36 @@ const normFile = (e: any) => {
 }
 
 const CreateForm: React.FC = () => {
-  const { state, dispatch } = UseApiContext()
-  const [isLoading, setLoading] = useState(false)
+  const { state } = UseFileContext()
   const [resetImage, setReSetImage] = useState(false)
   const [categories, setCategories] = useState<any>([])
+  const { data, isPending } = useQuery({
+    queryKey: ['category'],
+    queryFn: () => GetCategory({ page: 1, perPage: 50, search: '' }),
+  })
 
   const [form] = Form.useForm()
-
+  const mutation = useMutation({
+    mutationFn: (value: any) => {
+      return PostProduct(value)
+    },
+  })
   const CreateNewProduct = async (value: any) => {
-    setLoading(true)
     const formData = new FormData()
-
     formData.append('name', value.name)
     formData.append('price', value.price)
     formData.append('description', value.description)
     formData.append('categories', JSON.stringify(categories))
-
     state.UploadFile.forEach((file: any, index: number) => {
       formData.append(`images[${index}]`, file.originFileObj)
     })
 
-    try {
-      const response = await axios.post('/api/product', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-
-      form.resetFields()
-      setCategories([])
-      setLoading(false)
-      setReSetImage(true)
-      onSuccess(response.data.message)
-    } catch (error) {
-      setLoading(false)
-      const err: any = error
-      console.error('Error:', err.response.data)
-    }
+    await mutation.mutateAsync(formData)
+    mutation.reset()
+    form.resetFields()
+    setReSetImage(true)
   }
+  //
   const rules: any[] = [
     { required: true },
     { type: 'string', warningOnly: true },
@@ -61,77 +57,78 @@ const CreateForm: React.FC = () => {
 
   const pushCategories = (selectedIds: any) => {
     const selectedCategories = selectedIds.map((id: any) => {
-      const category: any = state.categoryData.find((item) => item.id === id)
+      const category: any = data.find((item: CategoryType) => item.id === id)
       return { id: category.id, name: category.name }
     })
     setCategories(selectedCategories)
   }
-
-  return (
-    <section
-      style={{
-        width: '50%',
-        backgroundColor: '#EDEDED',
-        padding: '10px',
-        borderRadius: '5px',
-      }}
-    >
-      <h1 style={{ fontSize: '2rem' }}>Create New Product</h1>
-      <Form
-        form={form}
-        labelCol={{ span: 4 }}
-        wrapperCol={{ span: 14 }}
-        layout="horizontal"
-        autoComplete="off"
-        style={{ maxWidth: 600 }}
-        onFinish={CreateNewProduct}
+  if (!isPending) {
+    return (
+      <section
+        style={{
+          width: '50%',
+          backgroundColor: '#EDEDED',
+          padding: '10px',
+          borderRadius: '5px',
+        }}
       >
-        {isLoading && <Spin />}
-        <Form.Item name="name" label="name" rules={rules}>
-          <Input />
-        </Form.Item>
-        <Form.Item name="price" label="price" rules={rules}>
-          <Input type="number" />
-        </Form.Item>
-        <Form.Item label="category">
-          <Space style={{ width: '100%' }} direction="vertical">
-            <Select
-              mode="multiple"
-              allowClear
-              style={{ width: '100%' }}
-              placeholder="Please select"
-              defaultValue={categories.map((category: any) => category.id)}
-              onChange={pushCategories}
-              options={state.categoryData.map((category) => ({
-                value: category.id,
-                label: category.name,
-              }))}
-            />
-          </Space>
-        </Form.Item>
-
-        <Form.Item rules={rules} label="description" name="description">
-          <TextArea rows={4} />
-        </Form.Item>
-
-        <Form.Item
-          rules={rules}
-          label="Upload"
-          valuePropName="fileList"
-          getValueFromEvent={normFile}
+        <h1 style={{ fontSize: '2rem' }}>Create New Product</h1>
+        <Form
+          form={form}
+          labelCol={{ span: 4 }}
+          wrapperCol={{ span: 14 }}
+          layout="horizontal"
+          autoComplete="off"
+          style={{ maxWidth: 600 }}
+          onFinish={CreateNewProduct}
         >
-          <ImageUpload reset={resetImage} />
-        </Form.Item>
-        <Form.Item label="Button">
-          <Space>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Space>
-        </Form.Item>
-      </Form>
-    </section>
-  )
+          {mutation.isPending && <Spin />}
+          <Form.Item name="name" label="name" rules={rules}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="price" label="price" rules={rules}>
+            <Input type="number" />
+          </Form.Item>
+          <Form.Item label="category">
+            <Space style={{ width: '100%' }} direction="vertical">
+              <Select
+                mode="multiple"
+                allowClear
+                style={{ width: '100%' }}
+                placeholder="Please select"
+                defaultValue={categories.map((category: any) => category.id)}
+                onChange={pushCategories}
+                options={data.map((category: { id: number; name: string }) => ({
+                  value: category.id,
+                  label: category.name,
+                }))}
+              />
+            </Space>
+          </Form.Item>
+
+          <Form.Item rules={rules} label="description" name="description">
+            <TextArea rows={4} />
+          </Form.Item>
+
+          <Form.Item
+            rules={rules}
+            label="Upload"
+            valuePropName="fileList"
+            getValueFromEvent={normFile}
+          >
+            <ImageUpload reset={resetImage} />
+          </Form.Item>
+          <Form.Item label="Button">
+            <Space>
+              <Button type="primary" htmlType="submit">
+                Submit
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </section>
+    )
+  }
 }
 
 export default CreateForm

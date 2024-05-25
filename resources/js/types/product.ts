@@ -32,7 +32,7 @@ export interface ProductCard {
 export interface Product extends ProductCard {
   created_at: string
   updated_at: string
-  images: Image[]
+  images: ImageType[]
   product_meta_datas: ProductMetaData[]
 }
 
