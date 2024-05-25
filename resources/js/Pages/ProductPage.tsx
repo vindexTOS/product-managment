@@ -21,7 +21,7 @@ const ProductSinglePage: React.FC = () => {
   return (
     <Layout>
       <div style={{ padding: '20px' }} onClick={() => console.log(product)}>
-        <Card
+        {/* <Card
           hoverable
           cover={
             <Image
@@ -53,7 +53,7 @@ const ProductSinglePage: React.FC = () => {
               />
             </Col>
           ))}
-        </Row>
+        </Row> */}
       </div>
     </Layout>
   )

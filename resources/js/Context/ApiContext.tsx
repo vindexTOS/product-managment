@@ -32,6 +32,7 @@ interface State {
   UploadFile: UploadFile[]
   productData: Product[]
   productSingle: Product | any
+  isLoading: boolean
 }
 
 type Action =
@@ -46,6 +47,7 @@ type Action =
   | { type: 'trigger_GetProduct' }
   | { type: 'get_single_product'; payload: Product }
   | { type: 'trigger_GetSingleProduct'; payload: string }
+  | { type: 'set_isloading'; payload: boolean }
 
 const Context = createContext<null | Cell>(null)
 
@@ -61,6 +63,8 @@ export const ApiContextProvider = ({ children }: ApiContextProviderProps) => {
     // products
     productData: [],
     productSingle: {},
+    // status
+    isLoading: false,
   }
   //   get categorys
 
@@ -72,7 +76,6 @@ export const ApiContextProvider = ({ children }: ApiContextProviderProps) => {
       })
       .then((response) => {
         dispatch({ type: 'get_category', payload: response.data.data })
-        dispatch({ type: 'set_category_total', payload: response.data.total })
       })
       .catch((error) => {
         console.error('Error:', error.response.data)
@@ -91,12 +94,18 @@ export const ApiContextProvider = ({ children }: ApiContextProviderProps) => {
   }
 
   const GetSingleProduct = (id: string) => {
+    dispatch({ type: 'set_isloading', payload: true })
+
     axios
       .get(`/api/product/${id}`)
       .then((response) => {
+        console.log(response)
         dispatch({ type: 'get_single_product', payload: response.data.data })
+        dispatch({ type: 'set_isloading', payload: false })
       })
       .catch((error) => {
+        dispatch({ type: 'set_isloading', payload: false })
+
         console.error('Error:', error.response.data)
       })
   }
@@ -131,6 +140,9 @@ export const ApiContextProvider = ({ children }: ApiContextProviderProps) => {
       case 'trigger_GetSingleProduct':
         GetSingleProduct(action.payload)
         return { ...state }
+      // status
+      case 'set_isloading':
+        return { ...state, isLoading: action.payload }
       default:
         return state
     }
