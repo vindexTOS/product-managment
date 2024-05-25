@@ -1,8 +1,15 @@
 import React from 'react'
-import { Button, Card, Tag } from 'antd'
 import { Product } from '../../types/product'
 import { router } from '@inertiajs/react'
-
+import { Spin, Modal, Button, message, Card, Tag } from 'antd'
+import { ExclamationCircleOutlined } from '@ant-design/icons'
+import {
+  InvalidateQueryFilters,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query'
+import { DeleteProduct } from '../../API/ProductRequests'
+const { confirm } = Modal
 interface ProductCardProps {
   product: Product
 }
@@ -10,6 +17,33 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const navigateToProduct = (id: string) => {
     router.visit(`/product/${id}`)
+  }
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation({
+    mutationFn: (id: string) => {
+      return DeleteProduct(id)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries('products' as InvalidateQueryFilters)
+    },
+  })
+  const onDelete = async (id: string) => {
+    await mutation.mutateAsync(id)
+    mutation.reset()
+  }
+  const showDeleteConfirm = () => {
+    confirm({
+      title: 'Are you sure you want to delete this item?',
+      icon: <ExclamationCircleOutlined />,
+      content: 'This action cannot be undone.',
+      okText: 'Yes, delete it',
+      okType: 'danger',
+      cancelText: 'No, keep it',
+      onOk() {
+        onDelete(String(product.id))
+      },
+    })
   }
   return (
     <Card
@@ -23,6 +57,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         />
       }
     >
+      {mutation.isPending && <Spin />}
       <Card.Meta
         title={product.name}
         description={
@@ -43,7 +78,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         >
           Open
         </Button>
-        <Button style={{ backgroundColor: 'red', color: 'white' }}>
+        <Button
+          onClick={showDeleteConfirm}
+          style={{ backgroundColor: 'red', color: 'white' }}
+        >
           Delete
         </Button>
       </div>

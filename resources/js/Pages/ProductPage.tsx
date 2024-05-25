@@ -15,6 +15,7 @@ const ProductSinglePage: React.FC = () => {
     queryKey: ['product'],
     queryFn: () => GetSingleProduct(productId),
   })
+
   if (isPending) {
     return <Spin />
   }

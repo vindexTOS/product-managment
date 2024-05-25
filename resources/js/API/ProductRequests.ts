@@ -41,3 +41,16 @@ export const GetSingleProduct = async (id: string) => {
     onError(err.response.data.message)
   }
 }
+
+export const DeleteProduct = async (id: string) => {
+  try {
+    const response = await axios.delete(`/api/product/${id}`)
+    onSuccess(response.data.message)
+
+    return response
+  } catch (error) {
+    const err: any = error
+
+    onError(err.response.data.message)
+  }
+}

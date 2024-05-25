@@ -8,7 +8,7 @@ export const GetCategory = async (payload: GetCategoryType) => {
     const response = await axios.get('/api/category', {
       params: { page, per_page: perPage, search },
     })
-    console.log(response)
+
     return response.data.data
   } catch (error) {
     const err: any = error
@@ -25,4 +25,16 @@ export const PostCategory = (category: any) => {
     .catch((error) => {
       onError(error.response.data.message)
     })
+}
+
+export const DeleteCategory = async (id: string) => {
+  try {
+    const response = await axios.delete(`/api/category/${id}`)
+    onSuccess(response.data.message)
+
+    return response
+  } catch (error) {
+    const err: any = error
+    onError(err.response.data.message)
+  }
 }

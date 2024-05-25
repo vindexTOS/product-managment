@@ -6,6 +6,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class CategorysController extends Controller
@@ -70,6 +71,9 @@ class CategorysController extends Controller
         }
 
         $category->delete();
+        DB::table('product_meta_data')
+            ->where('category_id', $id)
+            ->delete();
 
         return response()->json(
             ['message' => 'Category deleted successfully.'],

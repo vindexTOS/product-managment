@@ -13,6 +13,9 @@ export default function ProductList() {
   if (isPending) {
     return <Spin />
   }
+  if (data.length <= 0) {
+    return <section>NO DATA</section>
+  }
   return (
     <section style={{}}>
       <main style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>

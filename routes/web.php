@@ -30,10 +30,7 @@ Route::post('/api/login', [AuthenticatedSessionController::class, 'store']);
 // categorys
 
 Route::post('/api/category', [CategorysController::class, 'store']);
-Route::delete('/api/category/delete:id', [
-    CategorysController::class,
-    'destroy',
-]);
+Route::delete('/api/category/{id}', [CategorysController::class, 'destroy']);
 Route::get('/api/category', [CategorysController::class, 'show']);
 
 //  product
@@ -45,6 +42,7 @@ Route::get('/api/product/{id}', [
     'showSingleProduct',
 ]);
 Route::delete('/api/product/{id}', [ProductsController::class, 'destroy']);
+// image
 Route::get('images/{filename}', [ProductsController::class, 'showImage']);
 Route::get('product/images/{filename}', [
     ProductsController::class,
