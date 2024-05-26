@@ -35,7 +35,7 @@ DB_PASSWORD=
 
 - run seeding
   it might take a while depending your hard drive capebility
-
+  - you can change amount of information you want to seed on database/seeders/ProductSeeder.php and changing  `$i = 0; $i < 100000; $i++ `for loops value
 ```
 php artisan db:seed --class=ProductSeeder
 ```
