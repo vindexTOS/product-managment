@@ -33,6 +33,10 @@ DB_PASSWORD=
 
 
 ```
+-run migrations
+``` 
+php artisan migrate
+```
 
 ### step 4: Seeding data base with 100k fake data
 
