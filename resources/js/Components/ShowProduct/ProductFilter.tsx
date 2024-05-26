@@ -9,17 +9,25 @@ const { Search } = Input
 const ProductFilter = ({ onFilter }: { onFilter: any }) => {
   const [search, setSearch] = useState('')
   const [selectedCategories, setSelectedCategories] = useState([])
+  const [sortPrice, setSortPrice] = useState('')
+  const [sortDate, setSortDate] = useState('desc')
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search)
 
     const categoriesParam = queryParams.get('categories')
     const searchParam = queryParams.get('search')
+    const priceParam = queryParams.get('price')
+    const dateParam = queryParams.get('date')
     if (searchParam) {
       setSearch(String(searchParam))
     }
     const newArr: any = categoriesParam?.split(',')
 
     setSelectedCategories(newArr)
+    if (priceParam && dateParam) {
+      setSortPrice(priceParam)
+      setSortDate(dateParam)
+    }
   }, [])
   const { data: categories, isLoading: isCategoriesLoading } = useQuery({
     queryKey: ['category'],
@@ -30,17 +38,29 @@ const ProductFilter = ({ onFilter }: { onFilter: any }) => {
     setSearch(e.target.value)
   }
 
+  const handlePriceChange = (value: any) => {
+    console.log(value)
+    setSortPrice(value)
+  }
+  const handleDateChange = (value: any) => {
+    console.log(value)
+    setSortDate(value)
+  }
   const handleCategoryChange = (value: any) => {
     setSelectedCategories(value)
   }
 
   const handleSubmit = () => {
-    onFilter({ search, categories: selectedCategories })
+    onFilter({
+      search,
+      categories: selectedCategories,
+      price: sortPrice,
+      date: sortDate,
+    })
   }
-
   return (
     <Form
-      style={{ paddingBottom: '5rem' }}
+      style={{ paddingBottom: '2rem' }}
       layout="inline"
       onFinish={handleSubmit}
     >
@@ -69,6 +89,27 @@ const ProductFilter = ({ onFilter }: { onFilter: any }) => {
             value={selectedCategories}
           />
         )}
+      </Form.Item>
+      <Form.Item label="Price">
+        <Select
+          style={{ width: 200 }}
+          placeholder="sort by price"
+          defaultValue={sortPrice}
+          onChange={handlePriceChange}
+        >
+          <Select.Option value="asc">Low to High</Select.Option>
+          <Select.Option value="desc">High to Low</Select.Option>
+        </Select>
+      </Form.Item>
+      <Form.Item label="Date Time">
+        <Select
+          style={{ width: 200 }}
+          defaultValue={sortDate}
+          onChange={handleDateChange}
+        >
+          <Select.Option value="asc">Oldest to Newest</Select.Option>
+          <Select.Option value="desc">Newest to Oldest</Select.Option>
+        </Select>
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit">

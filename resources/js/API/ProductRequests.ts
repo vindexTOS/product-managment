@@ -23,6 +23,8 @@ export const GetProducts = async (
   perPage = 10,
   search = '',
   categories = [],
+  price = '',
+  date = 'desc',
 ) => {
   try {
     const response = await axios.get('/api/product', {
@@ -31,6 +33,8 @@ export const GetProducts = async (
         per_page: perPage,
         search,
         categories,
+        price,
+        date,
       },
     })
     // console.log(response.data)

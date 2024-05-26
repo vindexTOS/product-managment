@@ -36,9 +36,9 @@ class ProductSeeder extends Seeder
                 'updated_at' => now(),
             ]);
 
-            $categoryIds = range(1, 5); // Assuming there are 5 categories
+            $categoryIds = range(1, 5);
             shuffle($categoryIds);
-            $selectedCategoryIds = array_slice($categoryIds, 0, rand(1, 3)); // Randomly select 1 to 3 categories
+            $selectedCategoryIds = array_slice($categoryIds, 0, rand(1, 3));
 
             foreach ($selectedCategoryIds as $categoryId) {
                 DB::table('product_meta_data')->insert([

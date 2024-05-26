@@ -87,7 +87,11 @@ class ProductsController extends Controller
                         ->orWhere('description', 'like', '%' . $search . '%');
                 });
             }
-            if (!empty($categories) && !in_array(null, $categories)) {
+            if (
+                !empty($categories) &&
+                !in_array(null, $categories) &&
+                $categories !== 'undefined'
+            ) {
                 Log::debug('Applying category filter:', [
                     'categories' => $categories,
                 ]);
@@ -97,7 +101,15 @@ class ProductsController extends Controller
                     $q->whereIn('name', $categories);
                 });
             }
-
+            $sortPrice = $request->get('price', 'desc');
+            $sortDate = $request->get('date', 'desc');
+            // $query->orderBy('created_at', 'desc');
+            if (!empty($sortPrice) && $sortPrice !== '') {
+                $query->orderBy('price', $sortPrice);
+            }
+            if (!empty($sortDate) && $sortDate !== '') {
+                $query->orderBy('created_at', $sortDate);
+            }
             $data = $query->paginate($perPage);
 
             return response()->json(['data' => $data], 200);

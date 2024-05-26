@@ -10,10 +10,12 @@ import ProductTable from './ProductTable'
 export default function ProductList() {
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(12)
+
   const [search, setSearch] = useState('')
   const [tableSwitcher, setTableSwitcher] = useState('Switch To Cards')
   const [categories, setCategories] = useState<any>([])
-
+  const [price, setPrice] = useState('')
+  const [date, setDate] = useState('desc')
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search)
 
@@ -21,12 +23,15 @@ export default function ProductList() {
     const perPageParam = queryParams.get('perPage')
     const searchParam = queryParams.get('search')
     const categoriesParam = queryParams.get('categories')
+    const priceParam = queryParams.get('price')
+    const dateParam = queryParams.get('date')
     console.log(pageParam)
     setPage(pageParam ? parseInt(pageParam) : 1)
     setPerPage(perPageParam ? parseInt(perPageParam) : 10)
     setSearch(searchParam || '')
     setCategories(categoriesParam ? categoriesParam.split(',') : [])
-
+    setPrice(priceParam || '')
+    setDate(dateParam || 'desc')
     //
     const savedTableSwitcher = localStorage.getItem('tableSwitcher')
     if (savedTableSwitcher) {
@@ -39,19 +44,26 @@ export default function ProductList() {
     queryParams.set('page', String(page))
     queryParams.set('perPage', String(perPage))
     queryParams.set('search', search)
-    queryParams.set('categories', categories.join(','))
+    queryParams.set('price', price)
+    queryParams.set('date', date)
+    if (categories && categories.length > 0 && categories[0] !== 'undefiend') {
+      queryParams.set('categories', categories?.join(','))
+    }
 
     window.history.pushState({}, '', `/products?${String(queryParams)}`)
   }, [page, perPage, search, categories])
-
   const { data, isPending } = useQuery({
-    queryKey: ['products', page, perPage, search, categories],
-    queryFn: () => GetProducts(page, perPage, search, categories),
+    queryKey: ['products', page, perPage, search, categories, price, date],
+    queryFn: () => GetProducts(page, perPage, search, categories, price, date),
   })
 
   const handleFilter = (filterParams: any) => {
+    console.log(page, perPage, search, categories, price, date)
+    // console.log('triggered')
     setSearch(filterParams.search)
     setCategories(filterParams.categories)
+    setPrice(filterParams.price)
+    setDate(filterParams.date)
     setPage(1)
   }
 
