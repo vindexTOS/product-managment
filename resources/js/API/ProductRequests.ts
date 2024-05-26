@@ -33,7 +33,7 @@ export const GetProducts = async (
         categories,
       },
     })
-    console.log(response.data)
+    // console.log(response.data)
     return response.data
   } catch (error) {
     const err: any = error

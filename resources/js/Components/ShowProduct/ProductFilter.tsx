@@ -14,7 +14,9 @@ const ProductFilter = ({ onFilter }: { onFilter: any }) => {
 
     const categoriesParam = queryParams.get('categories')
     const searchParam = queryParams.get('search')
-    setSearch(String(searchParam))
+    if (searchParam) {
+      setSearch(String(searchParam))
+    }
     const newArr: any = categoriesParam?.split(',')
 
     setSelectedCategories(newArr)
@@ -29,8 +31,6 @@ const ProductFilter = ({ onFilter }: { onFilter: any }) => {
   }
 
   const handleCategoryChange = (value: any) => {
-    console.log(value)
-
     setSelectedCategories(value)
   }
 
@@ -45,12 +45,11 @@ const ProductFilter = ({ onFilter }: { onFilter: any }) => {
       onFinish={handleSubmit}
     >
       <Form.Item>
-        <Search
+        <Input
           placeholder="Search products"
           value={search}
           onChange={handleSearchChange}
-          onSearch={handleSubmit}
-          style={{ width: 200 }}
+          style={{ width: 200, marginBottom: 20 }}
         />
       </Form.Item>
       <Form.Item>

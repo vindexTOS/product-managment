@@ -72,22 +72,25 @@ class ProductsController extends Controller
     //  get all the products
     public function show(Request $request)
     {
+        Log::debug($request);
         $perPage = $request->get('per_page', 10);
         $search = $request->get('search', '');
         $categories = $request->get('categories', []);
 
         try {
             $query = Product::with(['images', 'productMetaDatas.category']);
-
-            if ($search) {
+            if ($search !== null && $search !== '') {
+                Log::debug('Applying search filter:', ['search' => $search]);
                 $query->where(function ($q) use ($search) {
                     $q
                         ->where('name', 'like', '%' . $search . '%')
                         ->orWhere('description', 'like', '%' . $search . '%');
                 });
             }
-
-            if (!empty($categories)) {
+            if (!empty($categories) && !in_array(null, $categories)) {
+                Log::debug('Applying category filter:', [
+                    'categories' => $categories,
+                ]);
                 $query->whereHas('productMetaDatas.category', function (
                     $q
                 ) use ($categories) {
@@ -97,12 +100,7 @@ class ProductsController extends Controller
 
             $data = $query->paginate($perPage);
 
-            return response()->json(
-                [
-                    'data' => $data,
-                ],
-                200
-            );
+            return response()->json(['data' => $data], 200);
         } catch (\Throwable $th) {
             Log::error('An error occurred: ' . $th->getMessage());
             return response()->json(['error' => 'An error occurred.'], 500);

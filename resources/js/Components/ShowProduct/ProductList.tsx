@@ -2,14 +2,16 @@ import { Product } from '../../types/product'
 import ProductCard from './ProductCard'
 import { useQuery } from '@tanstack/react-query'
 import { GetProducts } from '../../API/ProductRequests'
-import { Pagination, Spin } from 'antd'
+import { Button, Pagination, Spin } from 'antd'
 import { useEffect, useState } from 'react'
 import ProductFilter from './ProductFilter'
+import ProductTable from './ProductTable'
 
 export default function ProductList() {
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(12)
   const [search, setSearch] = useState('')
+  const [tableSwitcher, setTableSwitcher] = useState('Switch To Cards')
   const [categories, setCategories] = useState<any>([])
 
   useEffect(() => {
@@ -24,6 +26,12 @@ export default function ProductList() {
     setPerPage(perPageParam ? parseInt(perPageParam) : 10)
     setSearch(searchParam || '')
     setCategories(categoriesParam ? categoriesParam.split(',') : [])
+
+    //
+    const savedTableSwitcher = localStorage.getItem('tableSwitcher')
+    if (savedTableSwitcher) {
+      setTableSwitcher(savedTableSwitcher)
+    }
   }, [])
   useEffect(() => {
     const queryParams = new URLSearchParams()
@@ -52,6 +60,17 @@ export default function ProductList() {
     setPerPage(pageSize)
   }
 
+  const SwitchLayOut = () => {
+    if (tableSwitcher == 'Switch To Cards') {
+      localStorage.setItem('tableSwitcher', 'Switch To Table')
+
+      setTableSwitcher('Switch To Table')
+    } else if (tableSwitcher == 'Switch To Table') {
+      localStorage.setItem('tableSwitcher', 'Switch To Cards')
+
+      setTableSwitcher('Switch To Cards')
+    }
+  }
   if (data?.data.length <= 0) {
     return <section>NO DATA</section>
   }
@@ -59,18 +78,29 @@ export default function ProductList() {
   return (
     <section>
       <ProductFilter onFilter={handleFilter} />
+      <Button type="primary" onClick={() => SwitchLayOut()}>
+        {tableSwitcher}
+      </Button>
+
       {isPending && <Spin />}
       <main
         style={{
+          paddingTop: '40px',
           display: 'flex',
           flexWrap: 'wrap',
           gap: 10,
           marginLeft: '50px',
         }}
       >
-        {data?.data.data.map((val: Product) => {
-          return <ProductCard key={val.id} product={val} />
-        })}
+        {tableSwitcher !== 'Switch To Table' ? (
+          <ProductTable data={data?.data.data} isPending={isPending} />
+        ) : (
+          <>
+            {data?.data.data.map((val: Product) => (
+              <ProductCard key={val.id} product={val} />
+            ))}
+          </>
+        )}
       </main>
       <Pagination
         current={Number(page)}

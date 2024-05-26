@@ -21,9 +21,8 @@ Route::get('/product/{id}', function () {
 });
 Route::get('/admin', function () {
     return Inertia::render('Admin');
-})
-    ->middleware(['auth', SuperAdmin::class])
-    ->name('admin');
+});
+
 // /api
 Route::post('/api/login', [AuthenticatedSessionController::class, 'store']);
 
