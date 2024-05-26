@@ -1,12 +1,12 @@
-### Get Started
+# Get Started
 
-# step 1 : clone the repo
+### step 1 : clone the repo
 
 ```
 git clone https://github.com/vindexTOS/product-managment.git
 ```
 
-# step 2: install deps
+### step 2: install deps
 
 Go to projects directory
 
@@ -16,7 +16,7 @@ composer install
 npm install
 ```
 
-# step 3: set up env
+### step 3: set up env
 
 change database connection for your envirment
 
@@ -31,7 +31,7 @@ DB_PASSWORD=
 
 ```
 
-# step 4: Seeding data base with 100k fake data
+### step 4: Seeding data base with 100k fake data
 
 - run seeding
   it might take a while depending your hard drive capebility
@@ -40,9 +40,9 @@ DB_PASSWORD=
 php artisan db:seed --class=ProductSeeder
 ```
 
-### About app
+# About app
 
-# Technologies used
+### Technologies used
 
 - Laravel
 - MarianDb
